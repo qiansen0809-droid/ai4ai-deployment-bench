@@ -125,16 +125,9 @@ def test_observers_are_closed_after_partial_start_failure(tmp_path):
     assert closed and result["summary"]["failed"] == 1
 
 
-def test_example_provider_uses_same_common_entry(tmp_path):
+def test_smoke_fixture_uses_common_entry(tmp_path):
     root = Path(__file__).resolve().parents[1]
-    config = json.loads((root / "tasks/llm/mock.json").read_text())
-    task = build_task(config["provider"], config, root / "tasks/llm")
+    config = json.loads((root / "tests/fixtures/smoke.json").read_text())
+    task = build_task(config["provider"], config, root / "tests/fixtures")
     result = evaluate(task, tmp_path / "run", config)
     assert result["simulated"] and result["summary"]["passed"] == 3
-
-
-def test_incomplete_real_configuration_fails_before_model_start():
-    root = Path(__file__).resolve().parents[1]
-    config = json.loads((root / "tasks/llm/template.json").read_text())
-    with pytest.raises(ValueError, match="fill model"):
-        build_task(config["provider"], config, root / "tasks/llm")

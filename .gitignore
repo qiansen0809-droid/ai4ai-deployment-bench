@@ -9,4 +9,3 @@ models/
 .env
 *.key
 *.pem
-tasks/llm/local*.json
