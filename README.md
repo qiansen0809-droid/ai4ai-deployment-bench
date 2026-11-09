@@ -6,17 +6,34 @@
 
 ## 文件结构
 
-| 目录 | 用途 |
-|---|---|
-| `engine_refs/upstream/vllm` | 固定官方 v0.32.0 起点，提交记录在 versions.json |
-| `engine_refs/upstream/{sglang,lmcache}` | 基线官方实现，submodule 固定提交 |
-| `tasks/llm` | 评测必需的任务模板、最小请求示例、候选修改范围 |
-| `adapters/llm` | vLLM 流式 completion 客户端 |
-| `baselines` | 11 个启动配置、同步搬运微基准、LRU 策略参考 |
-| `evaluation` | 请求回放、token 一致性门槛、时延/吞吐汇总、路径检查 |
-| `instrumentation` | 请求事件、GPU 采样、引擎 metrics 采集、恢复校验参考 |
-| `environments` | 环境安装与冻结说明 |
-| `tests` | CPU 契约、故障与 HTTP 集成测试 |
+```text
+项目仓库/
+├── tasks/                       # 任务规格与评测所需的最小请求格式
+│   ├── llm/                     # LLM 模型、负载、约束、允许修改范围及模拟请求示例
+│   ├── vlm/                     # 预留：VLM 任务规格，由 VLM 负责人接入
+│   └── vla/                     # 预留：VLA 任务规格，由 VLA 负责人接入
+├── adapters/                    # 将各推理框架接到统一评测接口
+│   ├── llm/                     # 已实现：vLLM 流式 completion 客户端
+│   ├── vlm/                     # 预留：视觉语言模型运行框架适配
+│   └── vla/                     # 预留：动作模型与环境适配
+├── baselines/                   # 传统基线启动器、LRU 参考策略、同步搬运微基准
+│   └── configs/                 # 11 个基线配置：前缀缓存、分页、卸载、调度、FP8 等
+├── evaluation/                  # 评测入口、请求回放、token 校验、结果汇总及修改范围检查
+├── instrumentation/             # 公共事件日志、GPU 采样、vLLM 内部指标采集、恢复校验参考
+├── environments/                # 环境安装与版本冻结说明；各方向依赖应独立管理
+├── engine_refs/                 # 上游版本锁、基线来源及实现对应说明
+│   └── upstream/                # 通过 Git submodule 引用固定版本官方源码
+│       ├── vllm/                # vLLM 起点代码及其原生缓存、调度、卸载实现
+│       ├── sglang/              # SGLang 精确前缀缓存、LRU、HiCache 基线源码
+│       └── lmcache/             # LMCache 多级 KV 缓存基线源码
+├── tests/                       # 本地 CPU 契约测试、故障检测及 HTTP 集成测试
+└── .github/
+    └── workflows/               # GitHub Actions 自动运行测试与模拟回放
+```
+
+标为“预留”的 VLM/VLA 目录表示协作规划，当前代码分支未提交这些目录或实现；本次只实现 LLM 起点、评测、插桩与基线接入。模型、硬件和真实负载仍需填写。
+
+**审查入口：** [完整代码分支](https://github.com/qiansen0809-droid/ai4ai-deployment-bench/tree/codex/llm-deployment-start) · [PR #1 代码差异](https://github.com/qiansen0809-droid/ai4ai-deployment-bench/pull/1/files)。完整实现目前位于开发分支，尚未合并到 `main`。
 
 ## 本地验证
 
