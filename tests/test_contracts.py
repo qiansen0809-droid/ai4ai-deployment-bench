@@ -4,7 +4,6 @@ import json
 import time
 from pathlib import Path
 import pytest
-from adapters.mock import MockAdapter
 from adapters.base import Output
 from baselines.lru import LRU
 from baselines.launch import command
