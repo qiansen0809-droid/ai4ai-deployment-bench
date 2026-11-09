@@ -1,0 +1,10 @@
+{
+  "name": "kv_cpu_offload",
+  "engine": "vllm",
+  "args": [
+    "--enable-prefix-caching"
+  ],
+  "kind": "kv_offload",
+  "track": "strict_tokens",
+  "validation": "source_checked_not_gpu_verified"
+}

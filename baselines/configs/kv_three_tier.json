@@ -1,0 +1,10 @@
+{
+  "name": "kv_three_tier",
+  "engine": "vllm",
+  "args": [
+    "--enable-prefix-caching"
+  ],
+  "kind": "kv_three_tier",
+  "track": "strict_tokens",
+  "validation": "source_checked_not_gpu_verified"
+}

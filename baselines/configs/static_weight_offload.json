@@ -1,0 +1,8 @@
+{
+  "name": "static_weight_offload",
+  "engine": "vllm",
+  "args": [],
+  "kind": "weight_offload",
+  "track": "strict_tokens",
+  "validation": "source_checked_not_gpu_verified"
+}

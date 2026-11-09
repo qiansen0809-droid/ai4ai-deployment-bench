@@ -1,0 +1,12 @@
+{
+  "name": "prefix_exact",
+  "engine": "vllm",
+  "args": [
+    "--enable-prefix-caching",
+    "--block-size",
+    "16"
+  ],
+  "kind": null,
+  "track": "strict_tokens",
+  "validation": "source_checked_not_gpu_verified"
+}

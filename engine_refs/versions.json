@@ -1,0 +1,17 @@
+{
+  "vllm": {
+    "repository": "https://github.com/vllm-project/vllm",
+    "tag": "v0.32.0",
+    "commit": "5df63a7203cdb9328d824a27b682e77c7b9928be"
+  },
+  "sglang": {
+    "repository": "https://github.com/sgl-project/sglang",
+    "tag": "v0.5.23",
+    "commit": "297e54fd105e974cdf401e5b4d20253a22c16f90"
+  },
+  "lmcache": {
+    "repository": "https://github.com/LMCache/LMCache",
+    "tag": "v0.5.7",
+    "commit": "236f3eec32a2d330662a1795d90a01a1e0782c49"
+  }
+}

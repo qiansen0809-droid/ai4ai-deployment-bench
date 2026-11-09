@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/
+results/
+data/
+models/
+.env
+*.key
+*.pem
+tasks/llm/local*.json

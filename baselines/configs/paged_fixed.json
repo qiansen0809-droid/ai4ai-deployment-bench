@@ -1,0 +1,12 @@
+{
+  "name": "paged_fixed",
+  "engine": "vllm",
+  "args": [
+    "--block-size",
+    "16",
+    "--no-enable-prefix-caching"
+  ],
+  "kind": null,
+  "track": "strict_tokens",
+  "validation": "source_checked_not_gpu_verified"
+}

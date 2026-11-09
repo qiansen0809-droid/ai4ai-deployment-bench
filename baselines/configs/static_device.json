@@ -1,0 +1,11 @@
+{
+  "name": "static_device",
+  "engine": "vllm",
+  "args": [
+    "--cpu-offload-gb",
+    "0"
+  ],
+  "kind": null,
+  "track": "strict_tokens",
+  "validation": "source_checked_not_gpu_verified"
+}

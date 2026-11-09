@@ -1,0 +1,14 @@
+{
+  "name": "sglang_hicache",
+  "engine": "sglang",
+  "args": [
+    "--enable-hierarchical-cache",
+    "--hicache-ratio",
+    "2",
+    "--radix-eviction-policy",
+    "lru"
+  ],
+  "kind": null,
+  "track": "strict_tokens",
+  "validation": "source_checked_not_gpu_verified"
+}
