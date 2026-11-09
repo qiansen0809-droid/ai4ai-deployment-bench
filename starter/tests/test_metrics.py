@@ -1,4 +1,4 @@
-from instrumentation.engine_metrics import parse_counters, delta
+from starter.instrumentation.engine_metrics import parse_counters, delta
 
 
 def test_counter_labels_and_unsupported_metrics():

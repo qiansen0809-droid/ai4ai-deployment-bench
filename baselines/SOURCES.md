@@ -10,8 +10,8 @@
 | vLLM FP8 KV | `upstream/vllm/vllm/model_executor/layers/quantization/kv_cache.py` | fp8_kv |
 | SGLang 精确前缀缓存、LRU、HiCache | `upstream/sglang/python/sglang/srt/mem_cache/` | sglang_lru / sglang_hicache |
 | LMCache CPU/磁盘缓存 | `upstream/lmcache/lmcache/inprocess/v1/storage_backend/` | lmcache_three_tier |
-| 同步搬运参考起点 | `../baselines/sync_transfer.py` | Python 模块独立运行 |
-| LRU 策略参考起点 | `../baselines/lru.py` | Python 类直接调用 |
+| 同步搬运参考起点 | `sync_transfer.py` | Python 模块独立运行 |
+| LRU 策略参考起点 | `lru.py` | Python 类直接调用 |
 
 官方来源：[vLLM v0.32.0](https://github.com/vllm-project/vllm/tree/v0.32.0)、[SGLang v0.5.23](https://github.com/sgl-project/sglang/tree/v0.5.23)、[LMCache v0.5.7](https://github.com/LMCache/LMCache/tree/v0.5.7)。上游保留原许可证。
 

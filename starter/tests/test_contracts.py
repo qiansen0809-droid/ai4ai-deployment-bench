@@ -4,15 +4,15 @@ import json
 import time
 from pathlib import Path
 import pytest
-from adapters.base import Output
+from starter.adapters.base import Output
 from baselines.lru import LRU
 from baselines.launch import command
-from evaluation.check_scope import check_paths
-from instrumentation.events import EventLog
-from instrumentation.recovery import RecoveryGuard
+from starter.evaluation.check_scope import check_paths
+from starter.instrumentation.events import EventLog
+from starter.instrumentation.recovery import RecoveryGuard
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_lru_eviction_and_capacity():

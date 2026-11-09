@@ -12,13 +12,13 @@
 - `setup/teardown`：运行前准备和结束清理。
 - `observers`：公共或引擎专属采样，提供 start(output_dir) / finish(output_dir)。
 
-vLLM 的便捷接入函数是 `adapters.llm.provider.create_task(items, endpoint=..., model=...)`，直接接收现成 WorkItem，不加载文件。其默认严格 token 比较可替换成可信质量判定。
+vLLM 的便捷接入函数是 `starter.adapters.llm.provider.create_task(items, endpoint=..., model=...)`，直接接收现成 WorkItem，不加载文件。其默认严格 token 比较可替换成可信质量判定。
 
 ```bash
-python -m evaluation.run --provider PACKAGE:build --task CONFIG.json --output results/run-001
+python -m starter.evaluation.run --provider PACKAGE:build --task CONFIG.json --output results/run-001
 ```
 
-配置文件的位置任意；迁移目录只需调整模块导入。合成入口仅存在于 `tests/smoke_provider.py`，用于验证公共代码，不提供数据集格式。
+配置文件的位置任意；迁移目录只需调整模块导入。合成入口仅存在于 `starter/tests/smoke_provider.py`，用于验证公共代码，不提供数据集格式。
 
 ## 结果与计时
 

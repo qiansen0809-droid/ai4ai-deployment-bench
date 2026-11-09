@@ -1,8 +1,8 @@
 """Wire already prepared WorkItems to vLLM; no data loading or conversion."""
-from adapters.llm.vllm_http import VLLMAdapter
-from evaluation.contracts import Task, Verdict
-from instrumentation.engine_metrics import snapshot, delta
-from instrumentation.resources import GPUObserver
+from starter.adapters.llm.vllm_http import VLLMAdapter
+from starter.evaluation.contracts import Task, Verdict
+from starter.instrumentation.engine_metrics import snapshot, delta
+from starter.instrumentation.resources import GPUObserver
 
 
 class VLLMMetrics:

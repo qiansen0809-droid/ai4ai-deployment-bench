@@ -1,6 +1,6 @@
 """Load a trusted provider by module:function, independent of repo layout."""
 import importlib
-from evaluation.contracts import Task
+from starter.evaluation.contracts import Task
 
 
 def build_task(target, config, config_dir):
