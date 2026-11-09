@@ -33,7 +33,7 @@
 
 标为“预留”的 VLM/VLA 目录表示协作规划，当前代码分支未提交这些目录或实现；本次只实现 LLM 起点、评测、插桩与基线接入。模型、硬件和真实负载仍需填写。
 
-**审查入口：** [完整代码分支](https://github.com/qiansen0809-droid/ai4ai-deployment-bench/tree/codex/llm-deployment-start) · [PR #1 代码差异](https://github.com/qiansen0809-droid/ai4ai-deployment-bench/pull/1/files)。完整实现目前位于开发分支，尚未合并到 `main`。
+**审查入口：** [main 完整目录与代码](https://github.com/qiansen0809-droid/ai4ai-deployment-bench/tree/main) · [PR #1 代码差异](https://github.com/qiansen0809-droid/ai4ai-deployment-bench/pull/1/files)。完整实现已合并到 `main`，可直接在仓库主页查看。
 
 ## 本地验证
 
