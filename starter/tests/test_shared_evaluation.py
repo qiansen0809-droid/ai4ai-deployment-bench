@@ -2,9 +2,9 @@ import json
 import time
 from pathlib import Path
 import pytest
-from evaluation.contracts import Task, WorkItem, Verdict, RunAborted
-from evaluation.providers import build_task
-from evaluation.run import evaluate
+from starter.evaluation.contracts import Task, WorkItem, Verdict, RunAborted
+from starter.evaluation.providers import build_task
+from starter.evaluation.run import evaluate
 
 
 def test_opaque_payloads_and_action_outputs_need_no_llm_schema(tmp_path):
@@ -82,7 +82,7 @@ def test_deadline_failure_retained(tmp_path):
 
 
 def test_judge_runs_after_inference_measurements_are_frozen(tmp_path, monkeypatch):
-    from instrumentation.probe import RequestProbe
+    from starter.instrumentation.probe import RequestProbe
     finished = []
     original_finish = RequestProbe.finish
     def finish(probe):

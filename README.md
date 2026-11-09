@@ -1,98 +1,85 @@
-# AI4AI：待优化基线与公共评测组件
+# AI4AI：基线代码与公共起点
 
-**把基础代码交给 AI，让 AI 在固定模型与质量要求下优化部署性能。**
+项目目的是把基础代码交给 AI 优化，再用固定的公共评测和插桩检查结果。当前代码集中在 **`baselines/` 和 `starter/`**，其他协作目录仅占位，不实现其他负责人的工作。
 
-本仓库只提供两部分：
-
-1. **待优化的起点与基线代码**：官方引擎中的基础实现，以及简单的参考实现。AI 可以修改任务允许的缓存、分页、搬运、卸载和调度代码。
-2. **公共评测入口与插桩**：运行候选、检查输出、记录时延和资源指标，判断改动是否有效。评测和插桩不属于 AI 可修改的优化对象。
-
-不需要我们先把所有优化功能做完，才把代码交给 AI。模型、硬件和负载选定后，再运行起点与候选进行比较。当前没有真实 GPU 性能结论。
-
-## 当前目录
-
-目录可以随团队工程安排迁移，公共接口不绑定任务目录或数据文件格式。
+## 哪些目录有内容，哪些是空的
 
 ```text
 项目仓库/
-├── baselines/                   # 交给 AI 优化的基础实现与启动入口
-│   ├── configs/                 # 官方基线的启动配置
+├── baselines/                   # 【有内容】所有传统基线集中在这里
+│   ├── upstream/                # 【有内容】固定版本的官方方法源码（Git 子模块）
+│   │   ├── vllm/                # 缓存、分页、卸载、调度、FP8 KV
+│   │   ├── sglang/              # 前缀缓存、LRU、HiCache
+│   │   └── lmcache/             # 多级 KV 缓存
+│   ├── configs/                 # 【有内容】11 个基线启动配置
 │   ├── lru.py                   # 简单 LRU 策略参考
-│   └── sync_transfer.py         # 同步、不重叠的 CPU/GPU 搬运起点
-├── engine_refs/                 # 上游版本锁与基线来源
-│   └── upstream/               # 固定提交的官方方法源码
-│       ├── vllm/                # 缓存、分页、调度、卸载、FP8 KV 等实现
-│       ├── sglang/              # 前缀缓存、LRU、HiCache 等实现
-│       └── lmcache/             # 多级 KV 缓存实现
-├── evaluation/                  # 公共评测入口、依赖调度、校验与结果汇总
-├── instrumentation/             # 公共事件日志、计时、资源与引擎指标采集
-├── adapters/
-│   └── llm/                     # vLLM 接入公共评测的实现，不含数据加载器
-├── environments/                # 本项目与基线代码的环境说明
-├── tests/                       # 本项目单元测试，fixtures 仅用于测试
-└── .github/workflows/           # 自动测试
+│   ├── sync_transfer.py         # 同步、不重叠的 CPU/GPU 搬运基础程序
+│   ├── launch.py                # 共用启动器
+│   ├── versions.json            # 官方源码版本锁
+│   └── SOURCES.md               # 方法来源及对应关系
+├── starter/                     # 【有内容】我们的公共起点代码
+│   ├── adapters/llm/            # 首个具体引擎接入：vLLM
+│   ├── evaluation/              # 公共评测入口、依赖调度、校验、结果汇总
+│   ├── instrumentation/         # 公共计时、日志、资源与引擎指标采集
+│   └── tests/                   # 起点及基线的代码测试；合成夹具只在这里
+├── tasks/                       # 【空位】未实现任务配置或数据转换
+│   ├── llm/                     # 空位
+│   ├── vlm/                     # 空位
+│   └── vla/                     # 空位
+├── adapters/                    # 【空位】留给后续统一目录安排
+│   ├── llm/                     # 空位；已有 vLLM 接入在 starter/adapters/llm
+│   ├── vlm/                     # 空位
+│   └── vla/                     # 空位
+├── evaluation/                  # 【空位】已有公共实现集中在 starter/evaluation
+├── instrumentation/             # 【空位】已有公共实现集中在 starter/instrumentation
+├── environments/                # 【空位】当前代码环境说明在 starter/ENVIRONMENT.md
+├── engine_refs/                 # 【空位】现有基线来源及版本已移至 baselines
+└── .github/workflows/            # 【测试配置】自动测试，不是其他方向的业务实现
 ```
 
-仓库不实现统一数据格式、数据转换、VLM/VLA 专用任务、智能体提示词或跨方法对比统计。
+Git 不保存真正的空目录，因此“空位”目录仅含 `.gitkeep`，没有实现代码。根目录的 `pyproject.toml`、`.gitignore`、`.gitmodules` 是安装与版本管理文件。目录以后可以调整，这次不规定团队最终布局。
 
-## 交给 AI 的代码在哪里
+## 表里的传统基线是否覆盖
 
-方法源码通过 submodule 固定版本，配置文件只是启动入口。克隆时同时取得源码：
+**七类都有对应代码入口，但“三层统一接入”还只是组件与配置，不能说表内所有条目都已独立实现。** 下表区分基础代码与接入状态；不要求我们先替 AI 完成优化。
+
+| 任务 | 传统基线 | 放在哪里 | 当前提供内容 |
+|---|---|---|---|
+| KV 缓存管理 | 精确前缀缓存、LRU | `baselines/upstream/vllm`、`sglang`、`baselines/lru.py` | 官方实现、配置、独立 LRU 参考 |
+| 多级缓存 | vLLM 卸载连接器、LMCache、HiCache | `baselines/upstream/` 下三个项目 | 官方实现及启动配置；**三层统一接入尚无独立完成实现** |
+| 分页与内存块 | 常规分页、固定块大小 | `baselines/upstream/vllm` | 官方实现及固定块配置 |
+| CPU/GPU 数据搬运 | 同步拷贝、不重叠 | `baselines/sync_transfer.py` | 已有独立基础程序，可作为搬运优化起点 |
+| 计算切换与权重卸载 | 固定设备、静态权重卸载 | `baselines/upstream/vllm` | 官方实现及启动配置 |
+| 请求调度 | FCFS、重算式抢占 | `baselines/upstream/vllm` | 官方调度器及启动配置 |
+| 压缩与近似复用 | FP8 KV | `baselines/upstream/vllm` | 官方实现及 FP8 配置 |
+
+“允许的操作”是 AI 可以探索的修改空间，不要求起点先实现其中的全部优化。例如同步搬运就是普通起点，异步、合批、预取和重叠可以留给 AI 优化。
+
+多个基线共用 vLLM 中不同模块，因此官方源码只保存一份。点击 GitHub 的子模块目录会跳到官方固定版本；不是丢失源码。[具体代码入口](baselines/README.md) · [来源](baselines/SOURCES.md)。
+
+## 获取代码与运行
 
 ```bash
 git clone --recurse-submodules https://github.com/qiansen0809-droid/ai4ai-deployment-bench.git
 cd ai4ai-deployment-bench
+python -m pip install -e ".[test]"
+python -m pytest -q
+python -m starter.evaluation.run --task starter/tests/fixtures/smoke.json --output results/smoke
 ```
 
-| 待优化基线 | 代码入口 |
-|---|---|
-| 精确前缀缓存 / LRU | vLLM KV cache manager、SGLang radix cache、`baselines/lru.py` |
-| 多级缓存 | vLLM OffloadingConnector、LMCache CPU/磁盘 backend、SGLang HiCache |
-| 分页 / 固定块大小 | vLLM `vllm/v1/core/block_pool.py` |
-| 同步搬运 / 不重叠 | `baselines/sync_transfer.py` |
-| 固定设备 / 静态权重卸载 | vLLM `vllm/model_executor/offloader/` |
-| FCFS / 重算抢占 | vLLM `vllm/v1/core/sched/scheduler.py` |
-| FP8 KV | vLLM KV 量化实现及 `baselines/configs/fp8_kv.json` |
+已有旧版克隆在拉取目录迁移后，先执行 `git submodule sync --recursive`，再执行 `git submodule update --init --recursive`。
 
-[基线使用说明](baselines/README.md) 列出了具体文件、启动方法和优化对象；[版本与来源](engine_refs/BASELINES.md) 用于追溯原始实现。
-
-## 最小工作流程
-
-1. 选一个基线，保存原始提交和配置，作为共同起点。
-2. 将允许修改的代码交给 AI；不要求事先实现预取、重叠等优化。
-3. 起点和 AI 候选使用相同模型、负载、硬件及公共评测入口。
-4. 检查正确性，再看速度与资源变化；保留失败结果。
-
-例如，启动官方精确前缀缓存基线：
+选定模型和环境后启动基线：
 
 ```bash
 python -m baselines.launch baselines/configs/prefix_exact.json --model MODEL --revision REVISION --execute
-```
-
-同步搬运起点可独立运行：
-
-```bash
 python -m baselines.sync_transfer --mib 64 --repeats 10
 ```
 
-它是搬运优化题的基础程序，含 H2D/D2H 往返校验；该结果表示搬运性能，不表示完整模型性能。
-
-## 公共评测与插桩
-
-公共入口通过受信任的 provider 接收已准备好的请求、候选执行函数和质量校验函数，不读取或转换数据集：
+公共评测接收已准备好的请求，不承担数据加载/转换：
 
 ```bash
-python -m evaluation.run --provider PACKAGE:build --task CONFIG.json --output results/run-001
+python -m starter.evaluation.run --provider PACKAGE:build --task CONFIG.json --output results/run-001
 ```
 
-[接入说明](evaluation/README.md) 给出调用接口。vLLM 是一个具体接入；公共入口本身不限定模型方向。当前支持到达时间与依赖调度、deadline 判定、输出校验、事件记录和结果保存；CPU 内存峰值、强制终止挂死引擎和真实工具迁移/恢复尚未接入。
-
-代码测试：
-
-```bash
-python -m pip install -e ".[test]"
-python -m pytest -q
-python -m evaluation.run --task tests/fixtures/smoke.json --output results/smoke
-```
-
-smoke 是纯合成测试，不是数据规范或性能基准。引擎依赖及真实性能需要在选定环境运行；这与当前交付基础代码是两件事。
+[公共接入说明](starter/evaluation/README.md)。候选基线是优化对象，评测、质量判定与插桩保持固定。模拟运行只检验代码；同步搬运程序测的是搬运性能，真实 GPU/模型性能尚无实验结论。

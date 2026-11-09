@@ -1,6 +1,6 @@
 # 基线是 AI 的优化输入
 
-这里保留基础实现，不提前替 AI 完成优化。官方代码放在 `../engine_refs/upstream/`，简单参考代码在本目录；`configs/` 用来选择起点配置。
+这里保留基础实现，不提前替 AI 完成优化。官方代码放在 `upstream/`，简单参考代码在本目录；`configs/` 用来选择起点配置。
 
 ## 方法代码入口
 
@@ -8,7 +8,7 @@
 
 | 任务 | 现有起点代码 | 交给 AI 修改的对象 |
 |---|---|---|
-| KV 管理 | `engine_refs/upstream/vllm/vllm/v1/core/kv_cache_manager.py`；SGLang `python/sglang/srt/mem_cache/`；`baselines/lru.py` | 分配、回收、保留与驱逐策略 |
+| KV 管理 | `baselines/upstream/vllm/vllm/v1/core/kv_cache_manager.py`；SGLang `python/sglang/srt/mem_cache/`；`baselines/lru.py` | 分配、回收、保留与驱逐策略 |
 | 多级缓存 | vLLM `vllm/distributed/kv_transfer/kv_connector/v1/offloading/`、`vllm/v1/kv_offload/`；LMCache `lmcache/inprocess/v1/storage_backend/`；SGLang HiCache | 层级选择、保留、搬运、预取等实现 |
 | 分页与块管理 | vLLM `vllm/v1/core/block_pool.py` | 块管理与任务允许的分配策略 |
 | 同步搬运、不重叠 | `baselines/sync_transfer.py` | 基础 H2D/D2H 搬运路径；可研究合批、固定内存、异步与重叠 |

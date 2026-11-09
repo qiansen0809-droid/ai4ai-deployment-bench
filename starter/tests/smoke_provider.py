@@ -1,5 +1,5 @@
 """Synthetic evaluator fixture, not a benchmark dataset or data format."""
-from evaluation.contracts import Task, WorkItem, Verdict
+from starter.evaluation.contracts import Task, WorkItem, Verdict
 
 
 def build(config, config_dir):

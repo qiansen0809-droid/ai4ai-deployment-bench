@@ -4,8 +4,8 @@ import dataclasses
 import json
 import math
 import time
-from evaluation.contracts import WorkItem, Verdict, RunAborted
-from instrumentation.probe import RequestProbe
+from starter.evaluation.contracts import WorkItem, Verdict, RunAborted
+from starter.instrumentation.probe import RequestProbe
 
 
 def percentile(values, q):

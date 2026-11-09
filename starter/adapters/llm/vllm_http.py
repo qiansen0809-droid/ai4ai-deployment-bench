@@ -2,7 +2,7 @@
 import json
 import time
 import urllib.request
-from adapters.base import Output
+from starter.adapters.base import Output
 
 
 class VLLMAdapter:

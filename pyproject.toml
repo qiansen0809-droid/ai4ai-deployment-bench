@@ -13,8 +13,10 @@ dependencies = []
 test = ["pytest>=8,<9"]
 
 [tool.setuptools.packages.find]
-include = ["adapters*", "evaluation*", "instrumentation*", "baselines*"]
+include = ["starter*", "baselines*"]
+exclude = ["baselines.upstream*"]
+namespaces = false
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["starter/tests"]
 pythonpath = ["."]

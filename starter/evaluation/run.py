@@ -6,9 +6,9 @@ import platform
 import subprocess
 import uuid
 from pathlib import Path
-from evaluation.providers import build_task
-from evaluation.runner import replay, validate_items
-from instrumentation.events import EventLog
+from starter.evaluation.providers import build_task
+from starter.evaluation.runner import replay, validate_items
+from starter.instrumentation.events import EventLog
 
 
 def fingerprint(value):
@@ -57,7 +57,7 @@ def evaluate(task, output_dir, config=None):
         result["summary"].update(all_passed=False, run_error=failure)
     try:
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True,
-                                cwd=Path(__file__).resolve().parents[1], timeout=5).stdout.strip() or None
+                                cwd=Path(__file__).resolve().parents[2], timeout=5).stdout.strip() or None
     except (OSError, subprocess.SubprocessError):
         commit = None
     result.update(schema_version=2, run_id=run_id, simulated=task.simulated,

@@ -3,7 +3,7 @@ import json
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import pytest
-from adapters.llm.vllm_http import VLLMAdapter
+from starter.adapters.llm.vllm_http import VLLMAdapter
 
 
 @contextlib.contextmanager
