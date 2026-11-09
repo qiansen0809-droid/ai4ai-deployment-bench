@@ -1,0 +1,11 @@
+{
+  "name": "fp8_kv",
+  "engine": "vllm",
+  "args": [
+    "--kv-cache-dtype",
+    "fp8"
+  ],
+  "kind": null,
+  "track": "quality",
+  "validation": "source_checked_not_gpu_verified"
+}

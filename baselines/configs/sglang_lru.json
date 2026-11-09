@@ -1,0 +1,11 @@
+{
+  "name": "sglang_lru",
+  "engine": "sglang",
+  "args": [
+    "--radix-eviction-policy",
+    "lru"
+  ],
+  "kind": null,
+  "track": "strict_tokens",
+  "validation": "source_checked_not_gpu_verified"
+}

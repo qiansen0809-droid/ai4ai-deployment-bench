@@ -1,0 +1,8 @@
+{
+  "allowed_paths": [
+    "vllm/v1/core",
+    "vllm/v1/kv_offload",
+    "vllm/distributed/kv_transfer"
+  ],
+  "note": "Candidate vLLM repository only. Narrow and freeze per task before experiments; advisory path check, not semantic proof."
+}

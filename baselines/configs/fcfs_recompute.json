@@ -1,0 +1,11 @@
+{
+  "name": "fcfs_recompute",
+  "engine": "vllm",
+  "args": [
+    "--scheduling-policy",
+    "fcfs"
+  ],
+  "kind": null,
+  "track": "strict_tokens",
+  "validation": "source_checked_not_gpu_verified"
+}

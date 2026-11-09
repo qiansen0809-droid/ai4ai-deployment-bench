@@ -1,0 +1,9 @@
+[submodule "engine_refs/upstream/vllm"]
+	path = engine_refs/upstream/vllm
+	url = https://github.com/vllm-project/vllm.git
+[submodule "engine_refs/upstream/sglang"]
+	path = engine_refs/upstream/sglang
+	url = https://github.com/sgl-project/sglang.git
+[submodule "engine_refs/upstream/lmcache"]
+	path = engine_refs/upstream/lmcache
+	url = https://github.com/LMCache/LMCache.git

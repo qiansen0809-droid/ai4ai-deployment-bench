@@ -1,0 +1,8 @@
+{
+  "adapter": "mock",
+  "track": "strict_tokens",
+  "requests": "mock_requests.jsonl",
+  "split": "dev",
+  "concurrency": 2,
+  "warmup_requests": 1
+}
