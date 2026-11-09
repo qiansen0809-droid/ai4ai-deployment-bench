@@ -4,5 +4,6 @@
   "requests": "mock_requests.jsonl",
   "split": "dev",
   "concurrency": 2,
-  "warmup_requests": 1
+  "warmup_requests": 1,
+  "provider": "adapters.llm.provider:build"
 }

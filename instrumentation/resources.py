@@ -44,3 +44,15 @@ class GPUSampler:
         return {"method": "nvidia-smi device-wide sampled memory; includes other processes",
                 "interval_s": self.interval_s, "peak_mib_by_gpu": peaks or None,
                 "cpu_peak_bytes": None, "error": self.error, "samples": self.samples}
+
+
+class GPUObserver:
+    """Shared Task observer usable by any engine provider."""
+    def __init__(self):
+        self.sampler = GPUSampler()
+
+    def start(self, output_dir):
+        self.sampler.start()
+
+    def finish(self, output_dir):
+        return self.sampler.finish()
