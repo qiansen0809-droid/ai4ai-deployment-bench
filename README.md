@@ -1,39 +1,27 @@
 # AI4AI：基线代码与公共起点
 
-当前代码集中在 **`baselines/` 和 `starter/`**，其他目录仅占位。
+代码集中在 **`baselines/` 和 `starter/`**；不保留无内容的占位目录。
 
 ## 目录
 
 ```text
 项目仓库/
-├── baselines/                   # 【有内容】所有传统基线集中在这里
-│   ├── upstream/                # 【有内容】固定版本的官方方法源码（Git 子模块）
+├── baselines/                   # 所有传统基线集中在这里
+│   ├── upstream/                # 固定版本的官方方法源码（Git 子模块）
 │   │   ├── vllm/                # 缓存、分页、卸载、调度、FP8 KV
 │   │   ├── sglang/              # 前缀缓存、LRU、HiCache
 │   │   └── lmcache/             # 多级 KV 缓存
-│   ├── configs/                 # 【有内容】11 个基线启动配置
+│   ├── configs/                 # 11 个基线启动配置
 │   ├── lru.py                   # 简单 LRU 策略参考
 │   ├── sync_transfer.py         # 同步、不重叠的 CPU/GPU 搬运基础程序
 │   ├── launch.py                # 共用启动器
 │   ├── versions.json            # 官方源码版本锁
 │   └── SOURCES.md               # 方法来源及对应关系
-├── starter/                     # 【有内容】我们的公共起点代码
+├── starter/                     # 我们的公共起点代码
 │   ├── adapters/llm/            # 首个具体引擎接入：vLLM
 │   ├── evaluation/              # 公共评测入口、依赖调度、校验、结果汇总
 │   ├── instrumentation/         # 公共计时、日志、资源与引擎指标采集
 │   └── tests/                   # 起点及基线的代码测试；合成夹具只在这里
-├── tasks/                       # 【空位】未实现任务配置或数据转换
-│   ├── llm/                     # 空位
-│   ├── vlm/                     # 空位
-│   └── vla/                     # 空位
-├── adapters/                    # 【空位】留给后续统一目录安排
-│   ├── llm/                     # 空位；已有 vLLM 接入在 starter/adapters/llm
-│   ├── vlm/                     # 空位
-│   └── vla/                     # 空位
-├── evaluation/                  # 【空位】已有公共实现集中在 starter/evaluation
-├── instrumentation/             # 【空位】已有公共实现集中在 starter/instrumentation
-├── environments/                # 【空位】当前代码环境说明在 starter/ENVIRONMENT.md
-├── engine_refs/                 # 【空位】现有基线来源及版本已移至 baselines
 └── .github/workflows/            # 【测试配置】自动测试，不是其他方向的业务实现
 ```
 
