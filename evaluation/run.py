@@ -1,68 +1,87 @@
-"""python -m evaluation.run --task tasks/llm/mock.json --output results/demo"""
+"""Shared entry: a trusted provider supplies loading, execution and judging."""
 import argparse
+import hashlib
 import json
 import platform
 import subprocess
 import uuid
 from pathlib import Path
-from adapters.mock import MockAdapter
-from adapters.llm.vllm_http import VLLMAdapter
-from evaluation.runner import replay
+from evaluation.providers import build_task
+from evaluation.runner import replay, validate_items
 from instrumentation.events import EventLog
-from instrumentation.resources import GPUSampler
-from instrumentation.engine_metrics import snapshot, delta
-from tasks.schema import fingerprint, load_requests, verify_media
 
 
-def validate_config(cfg):
-    if cfg.get("adapter") not in ("mock", "vllm_http"):
-        raise ValueError("supported runners: mock, vllm_http; VLM/VLA require explicit implementation")
-    if cfg.get("track") != "strict_tokens":
-        raise ValueError("quality/compression tracks require a task-specific quality evaluator")
-    if cfg.get("adapter") != "mock":
-        for field in ("model", "model_revision", "engine_revision", "hardware_id", "endpoint", "candidate_revision"):
-            if not cfg.get(field):
-                raise ValueError(f"fill task.{field} before a real run")
-    if type(cfg.get("concurrency")) is not int or cfg["concurrency"] < 1:
-        raise ValueError("positive concurrency required")
+def fingerprint(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False,
+                                    allow_nan=False).encode()).hexdigest()
+
+
+def evaluate(task, output_dir, config=None):
+    task.items = list(task.items)
+    validate_items(task.items, task.concurrency)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=False)
+    run_id = str(uuid.uuid4())
+    log = EventLog(output_dir / "events.jsonl", run_id)
+    observers = []
+    resources = []
+    result = None
+    failure = None
+    try:
+        task.setup()
+        for observer in task.observers:
+            # Register before start so partially initialized observers are cleaned up.
+            observers.append(observer)
+            observer.start(output_dir)
+        result = replay(task, log)
+    except Exception as exc:
+        failure = type(exc).__name__ + ": " + str(exc)
+        log.emit(None, "run_failed", error=failure)
+    finally:
+        for observer in reversed(observers):
+            try:
+                resources.append({"observer": type(observer).__name__, "data": observer.finish(output_dir)})
+            except Exception as exc:
+                resources.append({"observer": type(observer).__name__, "error": str(exc)})
+        try:
+            task.teardown()
+        except Exception as exc:
+            failure = failure or "teardown_error: " + str(exc)
+        log.close()
+    if result is None:
+        result = {"requests": [{"request_id": i.request_id, "status": "failed", "error": failure,
+                                "scored_latency_ms": i.deadline_ms} for i in task.items],
+                  "summary": {"total": len(task.items), "passed": 0, "failed": len(task.items),
+                              "all_passed": False, "distribution_error": failure}}
+    if failure:
+        result["summary"].update(all_passed=False, run_error=failure)
+    try:
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True,
+                                cwd=Path(__file__).resolve().parents[1], timeout=5).stdout.strip() or None
+    except (OSError, subprocess.SubprocessError):
+        commit = None
+    result.update(schema_version=2, run_id=run_id, simulated=task.simulated,
+                  metadata=task.metadata, config_sha256=fingerprint(config or {}),
+                  harness_revision=commit, platform=platform.platform(), resources=resources)
+    (output_dir / "result.json").write_text(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
+    return result
 
 
 def main():
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--task", required=True); p.add_argument("--output", required=True)
-    a = p.parse_args()
-    config_path = Path(a.task).resolve()
-    cfg = json.loads(config_path.read_text(encoding="utf-8"))
-    validate_config(cfg)
-    rows = load_requests(config_path.parent / cfg["requests"])
-    if any(r["split"] != cfg["split"] for r in rows):
-        raise ValueError("workload split differs from task split")
-    verify_media(rows, config_path.parent / cfg.get("data_root", "."))
-    output = Path(a.output)
-    output.mkdir(parents=True, exist_ok=False)
-    run_id = str(uuid.uuid4())
-    log = EventLog(output / "events.jsonl", run_id)
-    sampler = GPUSampler()
-    adapter = MockAdapter() if cfg["adapter"] == "mock" else VLLMAdapter(cfg["endpoint"], cfg["model"], cfg.get("timeout_s", 30))
-    # Explicit readiness and warmup are outside measured replay.
-    try:
-        for row in rows[:cfg.get("warmup_requests", 0)]:
-            adapter.run(row, lambda *args, **kwargs: None)
-        before = snapshot(cfg["endpoint"], output / "metrics-before.prom") if cfg["adapter"] != "mock" else None
-        sampler.start()
-        result = replay(rows, adapter, log, cfg["concurrency"])
-        after = snapshot(cfg["endpoint"], output / "metrics-after.prom") if before is not None else None
-    finally:
-        resources = sampler.finish()
-        log.close()
-    commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip() or None
-    result.update(schema_version=1, run_id=run_id, simulated=cfg["adapter"] == "mock",
-                  task=cfg, task_sha256=fingerprint(cfg), workload_sha256=fingerprint(rows),
-                  harness_revision=commit, platform=platform.platform(), resources=resources,
-                  engine_metrics=delta(before, after) if before is not None else None,
-                  validation_level="mock_contract" if cfg["adapter"] == "mock" else "client_measurement_only")
-    (output / "result.json").write_text(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--task", required=True)
+    parser.add_argument("--provider", help="trusted module:function; overrides config.provider")
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    path = Path(args.task).resolve()
+    config = json.loads(path.read_text(encoding="utf-8"))
+    provider = args.provider or config.get("provider")
+    if not provider:
+        parser.error("supply --provider module:function or config.provider")
+    task = build_task(provider, config, path.parent)
+    result = evaluate(task, args.output, config)
     print(json.dumps(result["summary"], indent=2))
+    raise SystemExit(0 if result["summary"]["all_passed"] else 1)
 
 
 if __name__ == "__main__":

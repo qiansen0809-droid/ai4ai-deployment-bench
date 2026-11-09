@@ -13,5 +13,6 @@
   "concurrency": 1,
   "timeout_s": 30,
   "warmup_requests": 1,
-  "quality_threshold": null
+  "quality_threshold": null,
+  "provider": "adapters.llm.provider:build"
 }
