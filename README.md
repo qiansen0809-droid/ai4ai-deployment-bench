@@ -64,20 +64,3 @@ python -m pip install -e ".[test]"
 python -m pytest -q
 python -m starter.evaluation.run --task starter/tests/fixtures/smoke.json --output results/smoke
 ```
-
-已有旧版克隆在拉取目录迁移后，先执行 `git submodule sync --recursive`，再执行 `git submodule update --init --recursive`。
-
-选定模型和环境后启动基线：
-
-```bash
-python -m baselines.launch baselines/configs/prefix_exact.json --model MODEL --revision REVISION --execute
-python -m baselines.sync_transfer --mib 64 --repeats 10
-```
-
-公共评测接收已准备好的请求，不承担数据加载/转换：
-
-```bash
-python -m starter.evaluation.run --provider PACKAGE:build --task CONFIG.json --output results/run-001
-```
-
-[公共接入说明](starter/evaluation/README.md)。候选基线是优化对象，评测、质量判定与插桩保持固定。模拟运行只检验代码；同步搬运程序测的是搬运性能，真实 GPU/模型性能尚无实验结论。
